@@ -1,0 +1,104 @@
+{% extends "../base.html" %}
+{% load crispy_forms_tags %}
+
+{% load static %}
+{% load staticfiles %}
+
+{% block nav %}
+    <li class="nav-item">
+        {% if home == 'IMAGE' %}
+        <a class="nav-link" href="{% url 'image' %}">Home</a>
+        {% else %}
+        <a class="nav-link" href="{% url 'video' %}">Home</a>
+        {% endif %}
+    </li>
+    <li class="nav-item">
+        <a class="nav-link" href="{% url 'preference' %}">Preference</a>
+    </li>
+    <li class="nav-item">
+        <a class="nav-link" href="{% url 'logout' %}">Logout</a>
+    </li>
+    <li class="nav-item">
+        <a class="nav-link" href="{% url 'change_password' %}">Change Password</a>
+    </li>
+{% endblock nav %}
+
+
+{% block content %}
+
+
+<div class="card bg-light">
+
+    <div class="panel-heading text-center" style="margin-top: 15px;">
+        <span>
+            <img class="avatar" src="{{ avatar.url }}" style="height: 50px; width: 50px;">
+            <h3 class="card-title mt-3 text-center">Hello {{user.first_name}} {{user.last_name}}!</h3>
+        </span>
+    </div>
+
+    <form method="POST" enctype="multipart/form-data">
+    
+    <h4 class="card-title mt-3 text-center">Email / Username: {{user.email}}</h4>
+    <article class="card-body mx-auto" style="width: 35rem;">
+
+            {% csrf_token %}
+
+            <div class="form-group input-group input-group-sm">
+                <div class="input-group-prepend">
+                    <span class="input-group-text"> 
+                    <i class="fa fa-user"></i> &nbsp;
+                    First Name
+                    </span>
+                </div>
+
+                {{u_form.first_name}}
+
+            </div>
+
+            <div class="form-group input-group input-group-sm">
+                <div class="input-group-prepend">
+                    <span class="input-group-text"> 
+                    <i class="fa fa-user"></i> &nbsp;
+                    Last Name
+                    </span>
+                </div>
+                {{u_form.last_name}}
+            </div>
+
+            <br>
+            <div class="form-group input-group input-group-sm">
+                <div class="input-group-prepend">
+                    <span class="input-group-text"> 
+                    <i class="fa fa-portrait"></i> &nbsp;
+                    Change Profile Picture
+                    </span>
+                </div>
+                {{p_form.profile_image}}
+            </div>
+
+            <br>
+
+            {% if messages %}
+                {% for message in messages %}
+
+                    {{ message }}
+
+                {% endfor %}
+            {% endif %}
+            <br>
+
+            <div class="form-group">
+                <button type="submit" class="btn btn-primary btn-block btn-sm">Update</button>
+            </div>
+
+
+
+    </article>
+
+
+    </form>
+
+</div>
+
+
+{% endblock content %}

@@ -1,0 +1,10 @@
+{% autoescape off %}
+Hi {{ first_name }} {{ last_name }}!
+
+Welcome to Creative QA App.
+Please click on the link below to confirm your email.
+http://{{ domain }}{% url 'email_activation' activation_key=activation_key %}
+
+Best,
+CoE, Annalect India team!
+{% endautoescape %}

@@ -1,0 +1,88 @@
+{% extends "../base.html" %}
+{% load crispy_forms_tags %}
+
+{% load static %}
+{% load staticfiles %}
+
+{% block pic %}
+{% comment %} <a href="#" class="img logo mb-5" style="background-image: url({% static 'images/PageLogo/logo.png' %});"></a> {% endcomment %}
+
+{% endblock pic %}
+
+{% block nav %}
+    <li class="nav-item">
+		<a class="nav-link" href="{% url 'register' %}">Sign-Up</a>
+	</li>
+{% endblock nav %}
+
+
+
+{% block content %}
+
+
+<div class="card bg-light">
+
+
+<article class="card-body mx-auto" style="width: 35rem;">
+	<h4 class="card-title mt-3 text-center">Login</h4>
+
+	<form method="POST" enctype="multipart/form-data">
+		{% csrf_token %}
+
+
+	{% if form.errors %}
+		<div class="alert-danger">
+			{% for field in form %}
+                {% for error in field.errors %}
+                   {{ error|escape }}
+                {% endfor %}
+            {% endfor %}
+
+            {% for error in form.non_field_errors %}
+                {{ error|escape }}
+            {% endfor %}
+		</div>
+	{% endif %}
+
+    <div class="form-group input-group input-group-sm">
+    	<div class="input-group-prepend">
+		    <span class="input-group-text"> <i class="fa fa-envelope"></i> </span>
+		 </div>
+
+		{{ form.query }}
+
+    </div>
+
+
+    <div class="form-group input-group input-group-sm">
+    	<div class="input-group-prepend">
+		    <span class="input-group-text"> <i class="fa fa-lock"></i> </span>
+		</div>
+		{{ form.password }}
+    </div>
+
+
+    <div class="form-group">
+        <button type="submit" class="btn btn-primary btn-block btn-sm"> Sign In</button>
+    </div>
+
+	{% if request.GET.next %}
+		<input type="hidden" name="next" value="{{request.GET.next}}"/>
+	{% endif %}
+
+</form>
+
+<p class="text-center">Forgot Password? <a href="{% url 'password_reset' %}"> Reset Password</a> </p>
+<p class="text-center">Need An Account? <a href="{% url 'register' %}"> Sign Up</a> </p>
+
+<br>
+<p class="text-center">**Login only possible if your request is approved.</p>
+
+</article>
+
+
+</div>
+
+
+
+{% endblock content %}

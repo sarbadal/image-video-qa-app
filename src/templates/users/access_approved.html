@@ -1,0 +1,37 @@
+{% extends "../base.html" %}
+{% load crispy_forms_tags %}
+
+{% block nav %}
+    <li class="nav-item">
+        {% if home == 'IMAGE' %}
+            <a class="btn btn-secondary btn-sm" href="{% url 'image' %}">Home</a>
+        {% else %}
+            <a class="btn btn-secondary btn-sm" href="{% url 'video' %}">Home</a>
+        {% endif %}
+    </li>
+    <li class="nav-item">
+        <a class="nav-link" href="{% url 'profile' %}">Profile</a>
+    </li>
+    <li class="nav-item">
+        <a class="nav-link" href="{% url 'preference' %}">Preference</a>
+    </li>
+    <li class="nav-item">
+        <a class="nav-link" href="{% url 'logout' %}">Logout</a>
+    </li>
+    <li class="nav-item">
+        <a class="nav-link" href="{% url 'change_password' %}">Change Password</a>
+    </li>
+{% endblock nav %}
+
+{% block content %}
+    <div><br></div>
+
+    <div class="container">
+        <h3>
+            Thanks you! Email {{ activated_email }} has been activated.
+        </h3>
+        <p>
+            A confirmation email has been sent to {{ activated_email }}.
+        </p>
+    </div>
+{% endblock content %}

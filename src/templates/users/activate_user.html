@@ -1,0 +1,10 @@
+{% autoescape off %}
+Hi {{ first_name }} {{ last_name }}!
+
+{{ requester }} has requested for approval of the Creative QA App.
+To approve the requester please click on the link below to confirm your email.
+http://{{ domain }}{% url 'user_activation' activation_key=activation_key %}
+
+Best,
+CoE, Annalect India team!
+{% endautoescape %}

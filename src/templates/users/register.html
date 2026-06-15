@@ -1,0 +1,127 @@
+
+{% extends "../base.html" %}
+{% load crispy_forms_tags %}
+
+{% load static %}
+{% load staticfiles %}
+
+{% block pic %}
+{% comment %} <a href="#" class="img logo mb-5" style="background-image: url(/static/images/PageLogo/logo.png);"></a> {% endcomment %}
+
+{% endblock pic %}
+
+{% block nav %}
+    <li class="nav-item">
+		<a class="nav-link" href="{% url 'login' %}">Login</a>
+	</li>       				
+{% endblock nav %}
+
+	
+
+{% block content %}
+
+
+<div class="card bg-light">
+
+
+<article class="card-body mx-auto" style="width: 35rem;">
+	<h4 class="card-title mt-3 text-center">Create Account</h4>
+
+	<form method="POST" enctype="multipart/form-data">
+		{% csrf_token %}
+
+    <div class="form-group input-group input-group-sm">
+    	<div class="input-group-prepend">
+		    <span class="input-group-text"> <i class="fa fa-envelope"></i> </span>
+		 </div>
+
+		{{ form.email }}
+
+    </div>
+	{% if form.email.errors %}
+		<div class="alert-danger">
+			<p>{{ form.email.errors }}</p>
+		</div>
+	{% endif %}
+
+
+	<div class="form-group input-group input-group-sm">
+		<div class="input-group-prepend">
+		    <span class="input-group-text"> <i class="fa fa-user"></i> </span>
+		 </div>
+
+		{{ form.first_name }}
+        &nbsp;&nbsp;
+		{{ form.last_name }}
+    </div>
+
+
+    <div class="form-group input-group input-group-sm">
+    	<div class="input-group-prepend">
+		    <span class="input-group-text">
+              <i class="fa fa-user" style="color: #4169e1;"></i>
+            </span>
+		</div>
+
+		{{ form.approver }}
+
+	</div>
+
+
+    <div class="form-group input-group input-group-sm">
+    	<div class="input-group-prepend">
+		    <span class="input-group-text">
+			 <i class="fa fa-lock" style="color: #228b22;"></i> 
+			</span>
+		</div>
+		{{ form.password1 }}
+
+
+    </div>
+	<div class="content">
+		<ul class="help is-size-7 has-text-info" type = "disc">
+			<li>Your password can't be too similar to your other personal information.</li>
+			<li>Your password must contain at least 8 characters.</li>
+			<li>Your password can't be a commonly used password.</li>
+			<li>Your password can't be entirely numeric.</li>
+		</ul>
+	</div>
+
+	<div class="form-group input-group input-group-sm">
+    	<div class="input-group-prepend">
+		    <span class="input-group-text"> 
+				<i class="fa fa-lock" style="color: #228b22;"></i> 
+			</span>
+		</div>
+		{{ form.password2 }}
+
+    </div>
+	<div class="content">
+		{% if form.password2.errors %}
+			<div class="alert-danger">
+				{{ form.password2.errors }}
+			</div>
+        {% endif %}
+		<ul class="help is-size-7 has-text-info" type = "disc">
+			<li>Enter the same password as before, for verification.</li>
+		</ul>
+	</div>
+
+
+    <div class="form-group">
+        <button type="submit" class="btn btn-primary btn-block btn-sm"> Create Account  </button>
+    </div>
+    
+
+</form>
+
+<p class="text-center">Have an account? <a href="{% url 'login' %}">Log In</a> </p>
+
+</article>
+
+
+</div>
+
+
+
+{% endblock content %}

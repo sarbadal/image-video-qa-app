@@ -1,0 +1,10 @@
+{% autoescape off %}
+Hi {{ first_name }} {{ last_name }}!
+
+Welcome to Creative QA App.
+Your request has been approved. To login use the link below. Your email {{ email }} is your username.
+http://{{ domain }}{% url 'login' %}
+
+Best,
+CoE, Annalect India team!
+{% endautoescape %}

@@ -1,0 +1,44 @@
+<li class="active">
+
+    <a href="#homeSubmenu" data-toggle="collapse" aria-expanded="false" class="dropdown-toggle">
+        <i class="fa fa-cogs" aria-hidden="true"></i>&nbsp&nbspSettings
+    </a>
+
+    <ul class="collapse list-unstyled" id="homeSubmenu">
+        <li>
+            <div class="form-group">
+            <hr style="border: 1px solid red; border-radius: 5px; opacity: 0.2;">
+            <div><h6 id="zoom"  style="color: gray; font-size: 15px;">Set Zoom...</h6></div>
+            <div class="slidecontainer">
+                <input type="range" min="10" max="1000" value="{{ user_pref.zoom }}" step="1" class="slider" id="zoomRange">
+            </div>
+            </div>
+            <hr style="border: 1px solid red; border-radius: 5px; opacity: 0.2;">
+        </li>
+        <li>
+            <div class="form-group">
+            <div><h6 id="threshold" style="color: gray; font-size: 15px">Select Threshold...</h6></div>
+            <div class="slidecontainer">
+                <input type="range" min="1" max="500" value="{{ user_pref.threshold }}" step="1" class="slider" id="thresholdRange">
+            </div>
+            </div>
+            <hr style="border: 1px solid red; border-radius: 5px; opacity: 0.2;">
+        </li>
+        <li>
+            <div class="form-group">
+            <div><h6 id="rgbColor" style="color: gray; font-size: 15px">Color (RGB) (r,g,b)</h6></div>
+            <div class="slidecontainerr">
+                <input type="range" value="{{ user_pref.r }}" min="0" max="255" step="1" range="true" class="slider" id="redRange">
+            </div>
+            <div class="slidecontainerr">
+                <input type="range" value="{{ user_pref.g }}" min="0" max="255" step="1" range="true" class="slider" id="greenRange">
+            </div>
+            <div class="slidecontainerr">
+                <input type="range" value="{{ user_pref.b }}" min="0" max="255" step="1" range="true" class="slider" id="blueRange">
+            </div>
+            </div>
+            <hr style="border: 1px solid red; border-radius: 5px; opacity: 0.2;">
+        </li>
+    </ul>
+
+</li>

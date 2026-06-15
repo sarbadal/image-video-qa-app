@@ -1,0 +1,38 @@
+{% extends "../base.html" %}
+{% load crispy_forms_tags %}
+
+{% load static %}
+{% load staticfiles %}
+
+{% block pic %}
+{% comment %} <a href="#" class="img logo mb-5" style="background-image: url({% static 'images/PageLogo/logo.png' %});"></a> {% endcomment %}
+
+{% endblock pic %}
+
+{% block nav %}
+    <li class="nav-item">
+		<a class="nav-link" href="{% url 'register' %}">Sign-Up</a>
+	</li>
+{% endblock nav %}
+
+
+
+{% block content %}
+
+
+<div class="card bg-light">
+
+
+<article class="card-body mx-auto" style="width: 35rem;">
+	<h5 class="card-title mt-3 text-center">Your email {{ verified_email }} is already verified successfully.</h5>
+
+    <p class="text-center"><a href="{% url 'login' %}"> Sign-In Now</a> </p>
+
+</article>
+
+
+</div>
+
+
+{% endblock content %}
+

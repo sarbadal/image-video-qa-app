@@ -1,0 +1,129 @@
+{% extends "../nav_bar_base.html" %}
+{% load crispy_forms_tags %}
+
+{% block hearder %}
+
+<a class="button is-primary" href="{% url 'login' %}">
+<strong>Log-In</strong>
+</a>
+
+{% endblock %}
+
+{% block content %}
+
+
+    <section class="section">
+        <form method="POST">
+            {% csrf_token %}
+            <div class="container">
+                <div class="columns">
+                    <div class="column is-offset-3 is-6">
+
+            <div class="field">
+              <label class="label">Sign-Up </label>
+              <p class="control has-icons-left has-icons-right">
+                {{ form.email }}
+                <span class="icon is-small is-left">
+                  <i class="fa fa-envelope"></i>
+                </span>
+                <span class="icon is-small is-right">
+                  <i class="fa fa-check"></i>
+                </span>
+              </p>
+
+              {% if form.email.errors %}
+              <div class="content is-size-7 has-text-danger">
+                {{ form.email.errors }}
+              </div>
+              {% endif %}
+
+            </div>
+
+
+            <div class="field">
+              <p class="control has-icons-left">
+                {{ form.first_name }}
+                <span class="icon is-small is-left">
+                  <i class="fa fa-signature"></i>
+                </span>
+              </p>
+            </div>
+
+            <div class="field">
+              <p class="control has-icons-left">
+                {{ form.last_name }}
+                <span class="icon is-small is-left">
+                  <i class="fa fa-signature"></i>
+                </span>
+              </p>
+            </div>
+
+
+            <div class="field">
+              <p class="control has-icons-left">
+                {{ form.password1 }}
+                <span class="icon is-small is-left">
+                  <i class="fa fa-lock"></i>
+                </span>
+              </p>
+
+                <div class="content">
+                  <ul class="help is-size-7 has-text-info" type = "disc">
+                     <li>Your password can't be too similar to your other personal information.</li>
+                     <li>Your password must contain at least 8 characters.</li>
+                     <li>Your password can't be a commonly used password.</li>
+                     <li>Your password can't be entirely numeric.</li>
+                  </ul>
+                </div>
+
+            </div>
+
+            <div class="field">
+              <p class="control has-icons-left">
+                {{ form.password2 }}
+                <span class="icon is-small is-left">
+                  <i class="fa fa-lock"></i>
+                </span>
+              </p>
+
+              {% if form.password2.errors %}
+              <div class="content is-size-7 has-text-danger">
+                {{ form.password2.errors }}
+              </div>
+              {% endif %}
+
+              <div class="content">
+                <ul class="help is-size-7 has-text-info" type = "disc">
+                   <li>Enter the same password as before, for verification.</li>
+                </ul>
+              </div>
+
+            </div>
+
+            <div class="field">
+              <p class="control">
+
+                <small class="is-size-8 has-text-info">Select Approver</small>
+
+                {{ form.approver }}
+
+              </p>
+            </div>
+
+
+            <div class="field">
+              <p class="control">
+                <button class="button is-primary is-small">
+                  Sign Up
+                </button>
+                <small class="is-size-6 has-text-info">
+                    Already Have An Account? <a class="ml-2" href="{% url 'login' %}">Sign In</a>
+                </small>
+              </p>
+            </div>
+
+        </form>
+
+    </section>
+
+{% endblock content %}
