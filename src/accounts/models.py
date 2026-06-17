@@ -69,10 +69,7 @@ class CustomUser(AbstractBaseUser):
         return self.email
 
     def get_short_name(self):
-        """
-        The user is identified by
-        their email address
-        """
+        """The user is identified by their email address."""
         return self.email
 
     def has_perm(self, perm, obj=None):

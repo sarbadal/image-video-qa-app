@@ -8,6 +8,8 @@ from django.contrib.auth.forms import (
 )
 from users.models import Profile, UserPreferences
 
+_APPROVED_EMAIL_DOMAINS = ['annalect.com', 'omc.com', 'gmail.com', 'yahoo.com', 'outlook.com']
+
 
 def build_range_widget(min_value, max_value, step=1, include_width=True):
     attrs = {
@@ -92,11 +94,17 @@ class UserRegisterForm(UserCreationForm):
         email = self.cleaned_data['email'].strip().lower()
         domain = email.rsplit('@', maxsplit=1)[-1]
 
-        if domain != 'annalect.com':
-            raise forms.ValidationError('Domain must be annalect.com', code='email_domain')
+        if domain not in _APPROVED_EMAIL_DOMAINS:
+            raise forms.ValidationError(
+                f'Domain must be one of {_APPROVED_EMAIL_DOMAINS}', 
+                code='email_domain'
+            )
 
         if CustomUser.objects.filter(email__iexact=email).exists():
-            raise forms.ValidationError('Email is already taken', code='duplicate_email')
+            raise forms.ValidationError(
+                'Email is already taken', 
+                code='duplicate_email'
+            )
 
         return email
 
