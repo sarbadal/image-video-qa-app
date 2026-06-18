@@ -9,7 +9,6 @@ from core.views import landing_page
 app_urlpatterns = [
     path('', landing_page, name='landing_page'),
     path('image/', include('image.urls')),
-    path('video/', include('video.urls')),
     path('user/', include('users.urls')),
     path('admin/', admin.site.urls),
 ]

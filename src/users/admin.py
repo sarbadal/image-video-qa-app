@@ -1,5 +1,5 @@
 from django.contrib import admin
-from users.models import Profile, UserPreferences, EmailConfirmed
+from users.models import Profile, EmailConfirmed
 
 
 class UserNameColumnsMixin:
@@ -15,17 +15,6 @@ class UserNameColumnsMixin:
 @admin.register(Profile)
 class ProfileAdmin(UserNameColumnsMixin, admin.ModelAdmin):
     list_display = ('user', 'first_name', 'last_name')
-
-
-@admin.register(UserPreferences)
-class UserPreferencesAdmin(UserNameColumnsMixin, admin.ModelAdmin):
-    list_display = (
-        'user',
-        'first_name',
-        'last_name',
-        'default_img_zoom',
-        'default_img_threshold',
-    )
 
 
 @admin.register(EmailConfirmed)

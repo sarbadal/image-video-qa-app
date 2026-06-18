@@ -28,7 +28,6 @@ INSTALLED_APPS = [
     'accounts',
     'users',
     'image',
-    'video',
 ]
 
 MIDDLEWARE = [

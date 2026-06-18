@@ -7,8 +7,7 @@ from django.contrib.auth.forms import (
     SetPasswordForm
 )
 from users.models import Profile, UserPreferences
-
-_APPROVED_EMAIL_DOMAINS = ['annalect.com', 'omc.com', 'gmail.com', 'yahoo.com', 'outlook.com']
+from .allowed_email_domains import APPROVED_EMAIL_DOMAINS
 
 
 def build_range_widget(min_value, max_value, step=1, include_width=True):
@@ -94,9 +93,9 @@ class UserRegisterForm(UserCreationForm):
         email = self.cleaned_data['email'].strip().lower()
         domain = email.rsplit('@', maxsplit=1)[-1]
 
-        if domain not in _APPROVED_EMAIL_DOMAINS:
+        if domain not in APPROVED_EMAIL_DOMAINS:
             raise forms.ValidationError(
-                f'Domain must be one of {_APPROVED_EMAIL_DOMAINS}', 
+                f'Domain must be one of {APPROVED_EMAIL_DOMAINS}', 
                 code='email_domain'
             )
 
@@ -207,66 +206,3 @@ class ProfileUpdateForm(forms.ModelForm):
         """Model configuration for profile image updates."""
         model = Profile
         fields = ['profile_image']
-
-
-class UserPreferencesForm(forms.ModelForm):
-    """Form for updating image/video display preferences."""
-
-    default_tbl_color_r = forms.IntegerField(min_value=0, max_value=255, widget=build_range_widget(0, 255))
-    default_tbl_color_g = forms.IntegerField(min_value=0, max_value=255, widget=build_range_widget(0, 255))
-    default_tbl_color_b = forms.IntegerField(min_value=0, max_value=255, widget=build_range_widget(0, 255))
-
-    default_img_threshold = forms.IntegerField(min_value=0, max_value=255, widget=build_range_widget(0, 255))
-    default_video_threshold = forms.IntegerField(min_value=0, max_value=255, widget=build_range_widget(0, 255))
-
-    default_img_zoom = forms.IntegerField(min_value=0, max_value=500, widget=build_range_widget(0, 500, step=5, include_width=False))
-    default_video_zoom = forms.IntegerField(min_value=0, max_value=500, widget=build_range_widget(0, 500, step=5, include_width=False))
-
-    HOME_CHOICES = (('IMAGE', 'Image'), ('VIDEO', 'Video'))
-    home = forms.ChoiceField(
-        label='Set Default Home',
-        choices=HOME_CHOICES,
-        widget=forms.RadioSelect,
-    )
-    
-    class Meta:
-        """Model configuration for user preferences."""
-        model = UserPreferences
-        fields = [
-            'default_tbl_color_r',
-            'default_tbl_color_g',
-            'default_tbl_color_b',
-            'default_img_threshold',
-            'default_video_threshold',
-            'default_img_zoom',
-            'default_video_zoom',
-            'home'
-        ]
-
-
-class AspectRatioForm(forms.ModelForm):
-    """Simple form for width and height inputs."""
-
-    w = forms.CharField(
-        label='Width',
-        widget=forms.TextInput(attrs={
-            'class': 'form-control',
-            'placeholder': 'Enter Width here'
-        })
-    )
-    
-    h = forms.CharField(
-        label='Height',
-        widget=forms.TextInput(attrs={
-            'class': 'form-control',
-            'placeholder': 'Enter Height here'
-        })
-    )
-
-
-# AspectRatioCollectionFormSet = inlineformset_factory(
-#     CustomUser, AspectRatioForm,
-#     fields=('w', 'h'),
-#     can_delete=True,
-#     extra=1
-# )
