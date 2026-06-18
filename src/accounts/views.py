@@ -1,11 +1,13 @@
 from django.shortcuts import render, redirect
 from django.contrib.auth import login, logout
+from django.http import HttpRequest, HttpResponse
+
 from accounts.forms import UserLoginForm
 from users.models import UserPreferences
 
 
-def login_view(request):
-    """Login View"""
+def login_view(request: HttpRequest) -> HttpResponse:
+    """Authenticate a user and redirect to the preferred landing page."""
     form = UserLoginForm(request.POST or None)
 
     if request.method == 'POST':
@@ -32,7 +34,7 @@ def login_view(request):
     )
 
 
-def logout_view(request):
-    """Log-out View"""
+def logout_view(request: HttpRequest) -> HttpResponse:
+    """Log out the current user and redirect to the login page."""
     logout(request)
     return redirect("login")
