@@ -155,6 +155,28 @@ The deployment script now sets these runtime environment variables automatically
 
 Ensure the Cloud Run runtime service account has object write access to the bucket (for example `roles/storage.objectAdmin`).
 
+### Google Cloud Run auto-deploy command
+
+Run this from the repository root to deploy the app to Cloud Run, upload static files, backfill local media to `gs://<bucket>/media`, and set runtime environment variables:
+
+```bash
+python3 deployment.py \
+	--project-id YOUR_GCP_PROJECT_ID \
+	--region us-central1 \
+	--service image-video-qa-static \
+	--source . \
+	--bucket-name YOUR_GCS_BUCKET_NAME \
+	--service-account YOUR_CLOUD_RUN_SERVICE_ACCOUNT \
+	--allow-unauthenticated
+```
+
+Optional flags:
+
+- `--media-prefix media` to change the media folder prefix in the bucket.
+- `--static-release-dir 20260622-120000` to control static release path naming.
+- `--set-env KEY=VALUE` (repeatable) to inject extra runtime environment variables.
+- `--skip-install-requirements` if dependencies are already installed in the chosen Python environment.
+
 ## Common container commands
 
 ```bash
