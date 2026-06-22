@@ -6,6 +6,7 @@ django-import-export>=4.4.0
 django-password-reset>=1.0
 django-sslserver>=0.22.0
 django-storages>=1.14.0
+google-cloud-storage>=2.14.0
 Jinja2>=3.0.0
 moviepy>=2.2.1
 numba>=0.60.0

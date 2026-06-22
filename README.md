@@ -138,6 +138,23 @@ Current list:
 - Static assets live under [src/static](src/static).
 - EXIF executable path can now be configured by environment variable `EXIF_PATH`.
 
+### Google Cloud media storage
+
+For Cloud Run deployments using `deployment.py`:
+
+- Static files are uploaded to a timestamped prefix in the configured bucket.
+- Local media files from `src/media` are backfilled to `gs://<bucket>/media` during deploy.
+- Runtime uploads are written directly to the same bucket prefix via Django storage settings.
+
+The deployment script now sets these runtime environment variables automatically:
+
+- `USE_GCS_MEDIA=True`
+- `GS_BUCKET_NAME=<bucket-name>`
+- `GS_MEDIA_PREFIX=media` (customizable with `--media-prefix`)
+- `GS_QUERYSTRING_AUTH=False`
+
+Ensure the Cloud Run runtime service account has object write access to the bucket (for example `roles/storage.objectAdmin`).
+
 ## Common container commands
 
 ```bash

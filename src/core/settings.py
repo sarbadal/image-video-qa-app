@@ -131,8 +131,22 @@ STATICFILES_DIRS = [BASE_DIR / 'static']
 STATIC_URL = os.getenv('STATIC_URL', '/static/')
 STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
 
-MEDIA_ROOT = BASE_DIR / 'media'
-MEDIA_URL = '/media/'
+USE_GCS_MEDIA = _env_bool('USE_GCS_MEDIA', False)
+GS_BUCKET_NAME = os.getenv('GS_BUCKET_NAME', '').strip()
+GS_MEDIA_PREFIX = os.getenv('GS_MEDIA_PREFIX', 'media').strip('/').strip() or 'media'
+
+if USE_GCS_MEDIA:
+    if not GS_BUCKET_NAME:
+        raise RuntimeError('GS_BUCKET_NAME must be set when USE_GCS_MEDIA=True')
+    DEFAULT_FILE_STORAGE = 'storages.backends.gcloud.GoogleCloudStorage'
+    GS_LOCATION = GS_MEDIA_PREFIX
+    GS_DEFAULT_ACL = None
+    GS_QUERYSTRING_AUTH = _env_bool('GS_QUERYSTRING_AUTH', False)
+    MEDIA_ROOT = BASE_DIR / 'media'
+    MEDIA_URL = f'https://storage.googleapis.com/{GS_BUCKET_NAME}/{GS_MEDIA_PREFIX}/'
+else:
+    MEDIA_ROOT = BASE_DIR / 'media'
+    MEDIA_URL = '/media/'
 
 EXIF_PATH = Path(os.getenv('EXIF_PATH', str(BASE_DIR / 'exiftool' / 'exiftool.exe')))
 

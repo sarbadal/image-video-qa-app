@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Deploy this Django app to Google Cloud Run with static sync to GCS.
+"""Deploy this Django app to Google Cloud Run with static and media sync to GCS.
 
 Example:
     python deployment.py --project-id my-gcp-project --region us-central1
@@ -190,12 +190,16 @@ def deploy(args: argparse.Namespace) -> None:
 
     static_dir = (source_dir / args.static_dir).resolve()
     static_dir.mkdir(parents=True, exist_ok=True)
+    media_dir = (source_dir / args.media_dir).resolve()
 
     bucket_name = args.bucket_name or args.bucket or f"{project_id}-django-static"
     bucket_uri = f"gs://{bucket_name}"
     static_release_dir = args.static_release_dir or datetime.now(timezone.utc).strftime(
         "%Y%m%d-%H%M%S"
     )
+    media_prefix = args.media_prefix.strip("/")
+    if not media_prefix:
+        raise RuntimeError("--media-prefix cannot be empty")
     static_prefix = f"{static_release_dir}/static"
     static_url = f"https://storage.googleapis.com/{bucket_name}/{static_prefix}/"
 
@@ -204,6 +208,7 @@ def deploy(args: argparse.Namespace) -> None:
     print(f"Service: {args.service}")
     print(f"Bucket: {bucket_uri}")
     print(f"Static release dir: {static_release_dir}")
+    print(f"Media prefix: {media_prefix}")
 
     run_cmd(["gcloud", "config", "set", "project", project_id], dry_run=args.dry_run)
 
@@ -266,6 +271,24 @@ def deploy(args: argparse.Namespace) -> None:
         dry_run=args.dry_run,
     )
 
+    if media_dir.exists():
+        print("Syncing local media files to GCS...")
+        run_cmd(
+            [
+                "gcloud",
+                "storage",
+                "rsync",
+                "--recursive",
+                str(media_dir),
+                f"{bucket_uri}/{media_prefix}",
+                "--project",
+                project_id,
+            ],
+            dry_run=args.dry_run,
+        )
+    else:
+        print(f"Media directory not found, skipping media sync: {media_dir}")
+
     secret_key = args.secret_key or os.getenv("DJANGO_SECRET_KEY")
     if not secret_key:
         secret_key = secrets.token_urlsafe(50)
@@ -277,6 +300,10 @@ def deploy(args: argparse.Namespace) -> None:
         "ALLOWED_HOSTS": ".run.app,127.0.0.1,localhost",
         "CSRF_TRUSTED_ORIGINS": "https://*.run.app",
         "STATIC_URL": static_url,
+        "USE_GCS_MEDIA": "True",
+        "GS_BUCKET_NAME": bucket_name,
+        "GS_MEDIA_PREFIX": media_prefix,
+        "GS_QUERYSTRING_AUTH": "False",
     }
     env_vars.update(parse_extra_env(args.set_env))
 
@@ -315,7 +342,7 @@ def deploy(args: argparse.Namespace) -> None:
 
 def build_parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(
-        description="Deploy Django app to Google Cloud Run and upload static files to GCS."
+        description="Deploy Django app to Google Cloud Run and upload static/media files to GCS."
     )
     parser.add_argument("--project-id", help="Google Cloud project ID. Defaults to active gcloud project.")
     parser.add_argument("--region", default="us-central1", help="Cloud Run region.")
@@ -327,6 +354,11 @@ def build_parser() -> argparse.ArgumentParser:
         default="src/staticfiles",
         help="Directory populated by collectstatic and synced to GCS.",
     )
+    parser.add_argument(
+        "--media-dir",
+        default="src/media",
+        help="Local media directory to backfill into GCS before deploy.",
+    )
     parser.add_argument("--bucket-name", help="GCS bucket name for static files.")
     parser.add_argument(
         "--bucket",
@@ -336,6 +368,11 @@ def build_parser() -> argparse.ArgumentParser:
     parser.add_argument(
         "--static-release-dir",
         help="Static release subdirectory in yyyymmdd-hhmmss format. Defaults to current UTC timestamp.",
+    )
+    parser.add_argument(
+        "--media-prefix",
+        default="media",
+        help="Bucket path prefix used for Django media uploads.",
     )
     parser.add_argument("--python", default=sys.executable or "python3", help="Python executable to run manage.py")
     parser.add_argument("--port", type=int, default=8080, help="Container port for Cloud Run.")
