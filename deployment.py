@@ -131,6 +131,22 @@ def parse_extra_env(values: list[str]) -> dict[str, str]:
     return env_vars
 
 
+def format_gcloud_env_vars(env_vars: dict[str, str]) -> str:
+    """Format env vars for gcloud flags, supporting comma-containing values.
+
+    gcloud splits --set-env-vars values by comma by default, which breaks
+    values such as ALLOWED_HOSTS that legitimately include commas.
+    """
+    delimiter = "|"
+    for key, value in env_vars.items():
+        if delimiter in key or delimiter in value:
+            raise ValueError(
+                f"Unsupported character '{delimiter}' in environment key/value for: {key}"
+            )
+    joined = delimiter.join(f"{k}={v}" for k, v in env_vars.items())
+    return f"^{delimiter}^{joined}"
+
+
 def install_requirements(args: argparse.Namespace, source_dir: Path) -> None:
     """Install Python dependencies into the interpreter used for deployment steps."""
     if args.skip_install_requirements:
@@ -282,7 +298,7 @@ def deploy(args: argparse.Namespace) -> None:
         "--set-build-env-vars",
         "GOOGLE_ENTRYPOINT=gunicorn --bind :$PORT --chdir src core.wsgi:application",
         "--set-env-vars",
-        ",".join(f"{k}={v}" for k, v in env_vars.items()),
+        format_gcloud_env_vars(env_vars),
         "--quiet",
     ]
 
@@ -365,8 +381,20 @@ if __name__ == "__main__":
     raise SystemExit(main())
 
 
-    # python3 deployment.py \
-    #   --project-id YOUR_PROJECT_ID \
-    #   --region us-central1 \
-    #   --service image-video-qa \
-    #   --allow-unauthenticated
+# python3 deployment.py \
+#   --project-id development-490607 \
+#   --region us-central1 \
+#   --service image-video-qa-static \
+#   --source /home/sarbadal/image-video-qa-app \
+#   --bucket-name development-490607-django-static \
+#   --allow-unauthenticated \
+#   --skip-install-requirements
+
+# python3 deployment.py \
+#     --project-id development-490607 \
+#     --region us-central1 \
+#     --service image-video-qa-static \
+#     --source . \
+#     --bucket-name  create-qa-static \
+#     --allow-unauthenticated \
+#     --skip-install-requirements
