@@ -9,11 +9,8 @@ urlpatterns = [
     path('logout/', account_views.logout_view, name='logout'),
     path('register/', views.register, name='register'),
     path('profile/', views.profile, name='profile'),
-    path('preference/', views.preference, name='preference'),
-    path('preference/video-aspect-ratio/', views.video_aspect_ratio, name='preference_aspect_ratio'),
-    path('preference/video-format/', views.video_format, name='preference_video_formats'),
-    path('preference/video-duration/', views.video_duration, name='preference_video_duration'),
-    path('preference/audio-db-formset/', views.audio_db_minmax, name='preference_audio_db'),
+    # Keep legacy preference URL available after removing preference-specific view.
+    path('preference/', views.profile, name='preference'),
     path(
         'email/confirmation/<str:activation_key>/',
         views.email_confirm,

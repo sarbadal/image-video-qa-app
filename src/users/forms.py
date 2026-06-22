@@ -6,7 +6,7 @@ from django.contrib.auth.forms import (
     PasswordResetForm, 
     SetPasswordForm
 )
-from users.models import Profile, UserPreferences
+from users.models import Profile
 from .allowed_email_domains import APPROVED_EMAIL_DOMAINS
 
 

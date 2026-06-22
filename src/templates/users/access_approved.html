@@ -3,11 +3,7 @@
 
 {% block nav %}
     <li class="nav-item">
-        {% if home == 'IMAGE' %}
-            <a class="btn btn-secondary btn-sm" href="{% url 'image' %}">Home</a>
-        {% else %}
-            <a class="btn btn-secondary btn-sm" href="{% url 'video' %}">Home</a>
-        {% endif %}
+        <a class="btn btn-secondary btn-sm" href="{% url 'image' %}">Home</a>
     </li>
     <li class="nav-item">
         <a class="nav-link" href="{% url 'profile' %}">Profile</a>

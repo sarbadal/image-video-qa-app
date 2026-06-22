@@ -5,58 +5,20 @@ from django.contrib.auth import update_session_auth_hash
 from django.shortcuts import render, redirect, get_object_or_404
 from django.template.loader import render_to_string
 from django.contrib.sites.shortcuts import get_current_site
-from django.forms import inlineformset_factory
 from accounts.models import CustomUser
 from users.forms import (
     UserRegisterForm,
     UserPasswordChangeForm,
     UserUpdateForm,
     ProfileUpdateForm,
-    UserPreferencesForm
 )
-from users.models import Profile, EmailConfirmed, UserPreferences
-from video.models import VideoAspectRatio, VideoFormats, VideoDurations, AudioDecibel
+from users.models import Profile, EmailConfirmed
 
 
-def _build_aspect_ratio_formset():
-    return inlineformset_factory(
-        CustomUser,
-        VideoAspectRatio,
-        fields=['width', 'height'],
-        can_delete=True,
-        extra=1,
-    )
-
-
-def _build_video_format_formset():
-    return inlineformset_factory(
-        CustomUser,
-        VideoFormats,
-        fields=['formats'],
-        can_delete=True,
-        extra=1,
-    )
-
-
-def _build_video_duration_formset():
-    return inlineformset_factory(
-        CustomUser,
-        VideoDurations,
-        fields=['durations'],
-        can_delete=True,
-        extra=1,
-    )
-
-
-def _build_audio_decibel_formset():
-    return inlineformset_factory(
-        CustomUser,
-        AudioDecibel,
-        fields=['max_decibel', 'min_decibel'],
-        can_delete=False,
-        extra=1,
-        max_num=1,
-    )
+def _get_home_preference(user):
+    """Return user's home preference when available, otherwise None."""
+    preference = getattr(user, 'userpreferences', None)
+    return getattr(preference, 'home', None)
 
 
 def register(request):
@@ -228,9 +190,7 @@ def activate_user(request, activation_key):
 
 @login_required
 def change_password(request):
-    """Docstring"""
-    config = get_object_or_404(UserPreferences, user=request.user)
-
+    """Change password view for authenticated users."""
     if request.method == 'POST':
         form = UserPasswordChangeForm(request.user, request.POST)
         if form.is_valid():
@@ -253,7 +213,7 @@ def change_password(request):
         'users/change_password.html',
         {
             'form': form,
-            'home': config.home,
+            'home': _get_home_preference(request.user),
             'avatar': Profile.objects.get(user=request.user).profile_image,
             'title': 'Change Password'
         }
@@ -261,112 +221,9 @@ def change_password(request):
 
 
 @login_required
-def preference(request):
-    """doc string"""
-    avatar = get_object_or_404(Profile, user=request.user)
-    f_name = f'{avatar.user.first_name} {avatar.user.last_name}'
-
-    config = get_object_or_404(UserPreferences, user=request.user)
-    form = UserPreferencesForm(instance=config)
-
-    aspect_ratio_formset = _build_aspect_ratio_formset()(instance=request.user)
-    video_format_formset = _build_video_format_formset()(instance=request.user)
-    video_duration_formset = _build_video_duration_formset()(instance=request.user)
-    audio_db_formset = _build_audio_decibel_formset()(instance=request.user)
-
-    if request.method == 'POST':
-        p_form = UserPreferencesForm(request.POST, instance=request.user.userpreferences)
-
-        if p_form.is_valid():
-            p_form.save()
-            return redirect('preference')
-
-    context = {
-        'avatar': avatar.profile_image,
-        'name': f_name,
-        'form': form,
-        'aspect_ratio_formset': aspect_ratio_formset,
-        'video_format_formset': video_format_formset,
-        'video_duration_formset': video_duration_formset,
-        'audio_db_formset': audio_db_formset,
-        'home': config.home,
-        'r': config.default_tbl_color_r,
-        'g': config.default_tbl_color_g,
-        'b': config.default_tbl_color_b
-    }
-
-    return render(request, 'users/preference.html', context)
-
-
-@login_required
-def video_aspect_ratio(request):
-    """doc string"""
-    user = request.user
-    aspect_ratio_form = _build_aspect_ratio_formset()
-
-    if request.method == 'POST':
-        form = aspect_ratio_form(request.POST, instance=user)
-
-        if form.is_valid():
-            form.save()
-            return redirect('preference')
-
-    return redirect('preference')
-
-
-@login_required
-def video_duration(request):
-    """doc string"""
-    user = request.user
-    video_duration_form = _build_video_duration_formset()
-
-    if request.method == 'POST':
-        form = video_duration_form(request.POST, instance=user)
-
-        if form.is_valid():
-            form.save()
-            return redirect('preference')
-
-    return redirect('preference')
-
-
-@login_required
-def video_format(request):
-    """doc string"""
-    user = request.user
-    video_format_form = _build_video_format_formset()
-
-    if request.method == 'POST':
-        form = video_format_form(request.POST, instance=user)
-
-        if form.is_valid():
-            form.save()
-            return redirect('preference')
-
-    return redirect('preference')
-
-
-@login_required
-def audio_db_minmax(request):
-    """doc string"""
-    user = request.user
-    audio_decibel_form = _build_audio_decibel_formset()
-
-    if request.method == 'POST':
-        form = audio_decibel_form(request.POST, instance=user)
-
-        if form.is_valid():
-            form.save()
-            return redirect('preference')
-
-    return redirect('preference')
-
-
-@login_required
 def profile(request):
-    """doc string"""
+    """View for updating user profile information."""
     user = request.user
-    config = get_object_or_404(UserPreferences, user=request.user)
 
     if request.method == 'POST':
         u_form = UserUpdateForm(request.POST, instance=request.user)
@@ -393,7 +250,7 @@ def profile(request):
         'u_form': u_form,
         'p_form': p_form,
         'user': user,
-        'home': config.home,
+        'home': _get_home_preference(request.user),
         'avatar': Profile.objects.get(user=request.user).profile_image,
         'title': 'Profile',
     }

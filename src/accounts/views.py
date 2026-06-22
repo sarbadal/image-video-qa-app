@@ -3,7 +3,6 @@ from django.contrib.auth import login, logout
 from django.http import HttpRequest, HttpResponse
 
 from accounts.forms import UserLoginForm
-from users.models import UserPreferences
 
 
 def login_view(request: HttpRequest) -> HttpResponse:
@@ -19,13 +18,12 @@ def login_view(request: HttpRequest) -> HttpResponse:
             if next_url:
                 return redirect(next_url)
 
-            config = UserPreferences.objects.filter(user=request.user).first()
-            home = (config.home if config else 'image').lower()
+            home = 'image'
 
             if home == 'image':
                 return redirect('image')
 
-            return redirect('video')
+            return redirect('image')
 
     return render(
         request,

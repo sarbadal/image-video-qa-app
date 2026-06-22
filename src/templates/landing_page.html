@@ -2,69 +2,178 @@
 <!doctype html>
 <html lang="en">
   <head>
-    <!-- Required meta tags -->
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-    <link rel="shortcut icon" href="{% static 'favicon/favicon_annalect.png' %}"/>
-
-    <!-- Bootstrap CSS -->
+    <link rel="shortcut icon" href="{% static 'favicon/favicon.ico' %}" type="image/x-icon"/>
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" 
           integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;600;700;800&display=swap" rel="stylesheet">
 
     <title>CreativeQA</title>
     <style type="text/css">
-
-
-        .responsive {
-            width: 80%;
-            height: 70vh;
-            margin-left: 10%;
+        :root {
+            --bg-main: #f3f6f4;
+            --bg-accent: #d8ebe3;
+            --text-main: #13291f;
+            --text-soft: #3a4f45;
+            --brand: #1f7a55;
+            --brand-dark: #175d41;
+            --card: #ffffff;
         }
 
+        body {
+            margin: 0;
+            min-height: 100vh;
+            font-family: 'Manrope', sans-serif;
+            color: var(--text-main);
+            background: radial-gradient(circle at top right, var(--bg-accent) 0%, var(--bg-main) 45%, #ffffff 100%);
+        }
+
+        .hero {
+            padding: 48px 16px 28px;
+        }
+
+        .hero-card {
+            max-width: 980px;
+            margin: 0 auto;
+            border: 0;
+            border-radius: 18px;
+            background: var(--card);
+            box-shadow: 0 14px 35px rgba(22, 60, 46, 0.12);
+            overflow: hidden;
+        }
+
+        .hero-content {
+            padding: 34px 32px 14px;
+        }
+
+        .badge-soft {
+            display: inline-block;
+            font-size: 12px;
+            letter-spacing: 0.08em;
+            text-transform: uppercase;
+            font-weight: 700;
+            color: var(--brand-dark);
+            background: #e6f3ed;
+            border-radius: 999px;
+            padding: 8px 12px;
+            margin-bottom: 14px;
+        }
+
+        .hero-title {
+            font-size: clamp(1.8rem, 3.6vw, 2.7rem);
+            line-height: 1.2;
+            margin: 0 0 12px;
+            font-weight: 800;
+        }
+
+        .hero-subtitle {
+            max-width: 700px;
+            font-size: 1.05rem;
+            line-height: 1.7;
+            color: var(--text-soft);
+            margin-bottom: 22px;
+        }
+
+        .actions {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin-bottom: 14px;
+        }
+
+        .btn-brand {
+            background: var(--brand);
+            border-color: var(--brand);
+            color: #fff;
+            font-weight: 700;
+            padding: 8px 16px;
+        }
+
+        .btn-brand:hover {
+            background: var(--brand-dark);
+            border-color: var(--brand-dark);
+            color: #fff;
+        }
+
+        .btn-ghost {
+            border: 1px solid #c3d8cf;
+            color: var(--brand-dark);
+            background: #f7fbf9;
+            font-weight: 700;
+            padding: 8px 16px;
+        }
+
+        .btn-ghost:hover {
+            background: #edf6f1;
+            color: var(--brand-dark);
+        }
+
+        .hero-image-wrap {
+            padding: 0 16px 24px;
+        }
+
+        .hero-image {
+            display: block;
+            width: 100%;
+            max-width: 948px;
+            margin: 0 auto;
+            border-radius: 14px;
+            height: auto;
+            border: 1px solid #dce8e2;
+        }
+
+        .logged-out-note {
+            font-size: 0.92rem;
+            color: #557566;
+            margin-bottom: 4px;
+        }
+
+        @media (max-width: 768px) {
+            .hero-content {
+                padding: 24px 20px 10px;
+            }
+
+            .hero {
+                padding-top: 24px;
+            }
+        }
     </style>
 
   </head>
   <body>
-    <div class="jumbotron jumbotron-fluid">
+    <main class="hero">
+      <section class="hero-card">
+        <div class="hero-content">
+          <span class="badge-soft">Creative QA</span>
+          <h1 class="hero-title">Welcome to Creative QA</h1>
+          <p class="hero-subtitle">
+            Review image creatives quickly with a clean, practical workflow for validation,
+            visual checks, and confident sign-off.
+          </p>
 
-    <div class="container">
-        <h1>Welcome to Creative QA App</h1>
-        <p>
-            A quick and effective way to QA Image and Video creatives...
-        </p>
+          {% if user.is_authenticated %}
+            <div class="actions">
+              <a class="btn btn-brand btn-sm" href="{% url 'image' %}">Go to Home</a>
+              <a class="btn btn-outline-danger btn-sm" href="{% url 'logout' %}">Logout</a>
+            </div>
+          {% else %}
+            <p class="logged-out-note">Sign in to continue, or create a new account to get started.</p>
+            <div class="actions">
+              <a class="btn btn-brand btn-sm" href="{% url 'login' %}" role="button">Login</a>
+              <a class="btn btn-ghost btn-sm" href="{% url 'register' %}" role="button">Register</a>
+            </div>
+          {% endif %}
+        </div>
 
-        <hr>
-        <p class="lead">
-            
+        <div class="hero-image-wrap">
+          <img src="{% static 'images/page_logo/landing_page.jpg' %}" class="hero-image" alt="Creative QA preview">
+        </div>
+      </section>
+    </main>
 
-            {% if user.is_authenticated %}
-
-                {% if home == 'IMAGE' %}
-                    <a class="btn btn-secondary btn-sm" href="{% url 'image' %}">Home</a>
-                {% else %}
-                    <a class="btn btn-secondary btn-sm" href="{% url 'video' %}">Home</a>
-                {% endif %}
-                    <a class="btn btn-danger btn-sm" href="{% url 'logout' %}">Logout</a>
-
-            {% else %}
-
-                <a class="btn btn-primary btn-sm" href="{% url 'login' %}" role="button">Login</a>
-                <a class="btn btn-secondary btn-sm" href="{% url 'register' %}" role="button">Register</a>
-
-            {% endif %}
-        </p>
-
-    </div>
-
-    </div>
-
-
-    <div class="responsive"> 
-        <img src="{% static 'images/page_logo/landing_page.jpg' %}" class="responsive">
-    </div>
-
-    <!-- Optional JavaScript -->
-    <!-- jQuery first, then Popper.js, then Bootstrap JS -->
     <script src="https://code.jquery.com/jquery-3.2.1.slim.min.js" integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN" crossorigin="anonymous"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js" integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q" crossorigin="anonymous"></script>
     <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js" integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl" crossorigin="anonymous"></script>

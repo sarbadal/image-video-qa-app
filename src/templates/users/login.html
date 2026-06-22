@@ -1,88 +1,105 @@
-{% extends "../base.html" %}
-{% load crispy_forms_tags %}
-
 {% load static %}
-{% load static %}
+<!doctype html>
+<html lang="en">
+	<head>
+		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+		<title>Creative QA | Login</title>
+		<link rel="shortcut icon" href="{% static 'favicon/favicon.ico' %}" type="image/x-icon"/>
+		<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css"
+			integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
+		<link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css">
 
-{% block pic %}
-{% comment %} <a href="#" class="img logo mb-5" style="background-image: url({% static 'images/PageLogo/logo.png' %});"></a> {% endcomment %}
+		<style>
+			body {
+				background: #f5f7f9;
+			}
 
-{% endblock pic %}
+			.page-wrap {
+				max-width: 760px;
+				margin: 40px auto;
+				padding: 0 16px;
+			}
 
-{% block nav %}
-    <li class="nav-item">
-		<a class="nav-link" href="{% url 'register' %}">Sign-Up</a>
-	</li>
-{% endblock nav %}
+			.top-links {
+				text-align: right;
+				margin-bottom: 12px;
+			}
 
+			.input-group {
+				flex-wrap: nowrap;
+			}
 
+			.input-group .input-group-text {
+				min-width: 40px;
+				justify-content: center;
+			}
 
-{% block content %}
+			.alert-danger {
+				padding: 10px;
+			}
+		</style>
+	</head>
+	<body>
+		<div class="page-wrap">
+			<div class="top-links">
+				<a class="btn btn-link btn-sm" href="{% url 'register' %}">Sign-Up</a>
+			</div>
 
+			<div class="card bg-light">
+				<article class="card-body mx-auto" style="width: 35rem; max-width: 100%;">
+					<h4 class="card-title mt-3 text-center">Login</h4>
 
-<div class="card bg-light">
+					<form method="POST" enctype="multipart/form-data">
+						{% csrf_token %}
 
+						{% if form.errors %}
+							<div class="alert alert-danger" role="alert">
+								{% for field in form %}
+									{% for error in field.errors %}
+										{{ error|escape }}
+									{% endfor %}
+								{% endfor %}
 
-<article class="card-body mx-auto" style="width: 35rem;">
-	<h4 class="card-title mt-3 text-center">Login</h4>
+								{% for error in form.non_field_errors %}
+									{{ error|escape }}
+								{% endfor %}
+							</div>
+						{% endif %}
 
-	<form method="POST" enctype="multipart/form-data">
-		{% csrf_token %}
+						<div class="form-group input-group input-group-sm">
+							<div class="input-group-prepend">
+								<span class="input-group-text"><i class="fa fa-envelope"></i></span>
+							</div>
+							{{ form.query }}
+						</div>
 
+						<div class="form-group input-group input-group-sm">
+							<div class="input-group-prepend">
+								<span class="input-group-text"><i class="fa fa-lock"></i></span>
+							</div>
+							{{ form.password }}
+						</div>
 
-	{% if form.errors %}
-		<div class="alert-danger">
-			{% for field in form %}
-                {% for error in field.errors %}
-                   {{ error|escape }}
-                {% endfor %}
-            {% endfor %}
+						<div class="form-group">
+							<button type="submit" class="btn btn-primary btn-block btn-sm">Sign In</button>
+						</div>
 
-            {% for error in form.non_field_errors %}
-                {{ error|escape }}
-            {% endfor %}
+						{% if request.GET.next %}
+							<input type="hidden" name="next" value="{{ request.GET.next }}"/>
+						{% endif %}
+					</form>
+
+					<p class="text-center">Forgot Password? <a href="{% url 'password_reset' %}">Reset Password</a></p>
+					<p class="text-center">Need An Account? <a href="{% url 'register' %}">Sign Up</a></p>
+					<br>
+					<p class="text-center">**Login only possible if your request is approved.</p>
+				</article>
+			</div>
 		</div>
-	{% endif %}
 
-    <div class="form-group input-group input-group-sm">
-    	<div class="input-group-prepend">
-		    <span class="input-group-text"> <i class="fa fa-envelope"></i> </span>
-		 </div>
-
-		{{ form.query }}
-
-    </div>
-
-
-    <div class="form-group input-group input-group-sm">
-    	<div class="input-group-prepend">
-		    <span class="input-group-text"> <i class="fa fa-lock"></i> </span>
-		</div>
-		{{ form.password }}
-    </div>
-
-
-    <div class="form-group">
-        <button type="submit" class="btn btn-primary btn-block btn-sm"> Sign In</button>
-    </div>
-
-	{% if request.GET.next %}
-		<input type="hidden" name="next" value="{{request.GET.next}}"/>
-	{% endif %}
-
-</form>
-
-<p class="text-center">Forgot Password? <a href="{% url 'password_reset' %}"> Reset Password</a> </p>
-<p class="text-center">Need An Account? <a href="{% url 'register' %}"> Sign Up</a> </p>
-
-<br>
-<p class="text-center">**Login only possible if your request is approved.</p>
-
-</article>
-
-
-</div>
-
-
-
-{% endblock content %}
+		<script src="https://code.jquery.com/jquery-3.2.1.slim.min.js" integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN" crossorigin="anonymous"></script>
+		<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js" integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q" crossorigin="anonymous"></script>
+		<script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js" integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl" crossorigin="anonymous"></script>
+	</body>
+</html>
