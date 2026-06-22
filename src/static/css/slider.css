@@ -38,3 +38,40 @@ opacity: 1; /* Fully shown on mouse-over */
     background: #4CAF50; /* Green background */
     cursor: pointer; /* Cursor on hover */
 }
+
+/* RGB sliders */
+#redRange {
+    background: #ff5a5a;
+}
+
+#greenRange {
+    background: #49c96d;
+}
+
+#blueRange {
+    background: #4a90ff;
+}
+
+#redRange::-webkit-slider-thumb {
+    background: #ff0000;
+}
+
+#greenRange::-webkit-slider-thumb {
+    background: #00a63e;
+}
+
+#blueRange::-webkit-slider-thumb {
+    background: #0057ff;
+}
+
+#redRange::-moz-range-thumb {
+    background: #ff0000;
+}
+
+#greenRange::-moz-range-thumb {
+    background: #00a63e;
+}
+
+#blueRange::-moz-range-thumb {
+    background: #0057ff;
+}

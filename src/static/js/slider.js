@@ -10,8 +10,7 @@ var redSlider = document.getElementById("redRange");
 var greenSlider = document.getElementById("greenRange");
 var blueSlider = document.getElementById("blueRange");
 var colorOutput = document.getElementById("rgbColor");
-let rgbValue = redSlider.value + ', ' + greenSlider.value + ', ' + blueSlider.value;
-colorOutput.innerHTML = 'Color RGB: [' + rgbValue + ']'
+colorOutput.innerHTML = 'Set Color';
 
 // Update the current slider value (each time you drag the slider handle)
 zoomSlider.oninput = function() {
@@ -23,13 +22,13 @@ thresholdSlider.oninput = function() {
 }
 
 redSlider.oninput = function() {
-    colorOutput.innerHTML = 'Color RGB: [' + redSlider.value + ', ' + greenSlider.value + ', ' + blueSlider.value + ']';
+    colorOutput.innerHTML = 'Set Color';
 }
 
 greenSlider.oninput = function() {
-    colorOutput.innerHTML = 'Color RGB: [' + redSlider.value + ', ' + greenSlider.value + ', ' + blueSlider.value + ']';
+    colorOutput.innerHTML = 'Set Color';
 }
 
 blueSlider.oninput = function() {
-    colorOutput.innerHTML = 'Color RGB: [' + redSlider.value + ', ' + greenSlider.value + ', ' + blueSlider.value + ']';
+    colorOutput.innerHTML = 'Set Color';
 }

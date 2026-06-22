@@ -114,3 +114,12 @@ MEDIA_ROOT = BASE_DIR / 'media'
 MEDIA_URL = '/media/'
 
 EXIF_PATH = BASE_DIR / 'exiftool' / 'exiftool.exe'
+
+# Centralized defaults for image table sliders.
+IMAGE_TABLE_SLIDER_DEFAULTS = {
+    'zoom': 50,
+    'threshold': 150,
+    'r': 250,
+    'g': 250,
+    'b': 250,
+}

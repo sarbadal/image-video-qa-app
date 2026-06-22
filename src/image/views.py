@@ -5,6 +5,7 @@ from typing import Any
 
 from PIL import Image
 from PIL.ImageFile import ImageFile
+from django.conf import settings
 from django.core.files.uploadedfile import UploadedFile
 from django.shortcuts import get_object_or_404, render
 from django.contrib.auth.decorators import login_required
@@ -16,6 +17,17 @@ from image.models import ImageTable, ImageTableMetaData
 
 
 DIM_PATTERN = re.compile(r'[_-]?\d+x\d+[_]?')
+
+
+def _get_slider_defaults() -> dict[str, int]:
+    defaults = getattr(settings, 'IMAGE_TABLE_SLIDER_DEFAULTS', {})
+    return {
+        'zoom': int(defaults.get('zoom', 50)),
+        'threshold': int(defaults.get('threshold', 150)),
+        'r': int(defaults.get('r', 250)),
+        'g': int(defaults.get('g', 250)),
+        'b': int(defaults.get('b', 250)),
+    }
 
 
 def _get_latest_upload_instance(user: CustomUser) -> int | None:
@@ -119,9 +131,11 @@ def process_files(request: HttpRequest) -> HttpResponse:
         images = ImageTable.objects.filter(upload_instance=img_instance_last, user=request.user)
 
     data = [_build_data_row(img) for img in images]
+    user_pref = _get_slider_defaults()
 
     context: dict[str, Any] = {
         'data': json.dumps(data),
+        'user_pref': user_pref,
         'avatar': get_object_or_404(Profile, user=request.user).profile_image,
     }
 

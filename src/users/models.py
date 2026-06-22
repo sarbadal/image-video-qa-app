@@ -56,6 +56,44 @@ class EmailConfirmed(models.Model):
         verbose_name_plural = 'User Email-Confirmed'
 
 
+class UserPreferences(models.Model):
+    """Per-user defaults for landing page and table controls."""
+
+    HOME_CHOICES = (
+        ('IMAGE', 'IMAGE'),
+        ('VIDEO', 'VIDEO'),
+    )
+
+    user = models.OneToOneField(CustomUser, on_delete=models.CASCADE)
+    home = models.CharField(max_length=10, choices=HOME_CHOICES, default='IMAGE', verbose_name='home')
+    default_img_zoom = models.IntegerField(
+        default=30,
+        validators=[MinValueValidator(0), MaxValueValidator(500)],
+    )
+    default_video_zoom = models.IntegerField(
+        default=225,
+        validators=[MinValueValidator(0), MaxValueValidator(500)],
+    )
+    default_img_threshold = models.IntegerField(
+        default=150,
+        validators=[MinValueValidator(0), MaxValueValidator(255)],
+    )
+    default_video_threshold = models.IntegerField(
+        default=15,
+        validators=[MinValueValidator(0), MaxValueValidator(255)],
+    )
+    default_tbl_color_r = models.IntegerField(default=250, validators=[validate_rgb])
+    default_tbl_color_g = models.IntegerField(default=250, validators=[validate_rgb])
+    default_tbl_color_b = models.IntegerField(default=250, validators=[validate_rgb])
+
+    def __str__(self):
+        return self.user.email
+
+    class Meta:
+        """Meta class"""
+        verbose_name_plural = 'User Preferences'
+
+
 @receiver(post_save, sender=CustomUser)
 def create_user_defaults(sender, instance, created, **kwargs):
     """Create default one-to-one records when a user is created."""

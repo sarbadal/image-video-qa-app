@@ -41,11 +41,11 @@ function renderTable(event){
 	});
 
 	event.preventDefault();
-	let zoom = ((document.querySelector("#zoomRange")||{}).value)||"25";
-	let threshold = ((document.querySelector("#thresholdRange")||{}).value)||"150";
-	let r = ((document.querySelector("#redRange")||{}).value)||"200";
-	let g = ((document.querySelector("#greenRange")||{}).value)||"200";
-	let b = ((document.querySelector("#blueRange")||{}).value)||"200";
+	let zoom = ((document.querySelector("#zoomRange")||{}).value) || "0";
+	let threshold = ((document.querySelector("#thresholdRange")||{}).value) || "0";
+	let r = ((document.querySelector("#redRange")||{}).value) || "0";
+	let g = ((document.querySelector("#greenRange")||{}).value) || "0";
+	let b = ((document.querySelector("#blueRange")||{}).value) || "0";
 	let rowID = 1;
 
 	oTable = $('#imgTable').DataTable(
@@ -93,7 +93,7 @@ function renderTable(event){
 					title: "creative",
 					render: function(creative){
 						let imgTag = '<img src="' + creative + '"' + ' alt="Img" height="' + zoom + '"></img>';
-						let imgURL =  '<a href="/image/creative-img/single-image/' + rowID + '/" target="_blank">' + imgTag + '</a>';
+						let imgURL =  '<a href="/image/creative-img/image/' + rowID + '/" target="_blank">' + imgTag + '</a>';
 						rowID++;
 						return imgURL;
 					}
