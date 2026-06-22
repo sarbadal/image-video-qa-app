@@ -13,6 +13,7 @@ import secrets
 import shlex
 import subprocess
 import sys
+from datetime import datetime, timezone
 from pathlib import Path
 
 
@@ -21,7 +22,14 @@ def run_cmd(command: list[str], *, env: dict[str, str] | None = None, dry_run: b
     print(f"\n$ {shlex.join(command)}")
     if dry_run:
         return ""
-    completed = subprocess.run(command, env=env, check=True, text=True, capture_output=True)
+    try:
+        completed = subprocess.run(command, env=env, check=True, text=True, capture_output=True)
+    except subprocess.CalledProcessError as exc:
+        if exc.stdout:
+            print(exc.stdout.strip())
+        if exc.stderr:
+            print(exc.stderr.strip(), file=sys.stderr)
+        raise
     if completed.stdout:
         print(completed.stdout.strip())
     if completed.stderr:
@@ -123,6 +131,29 @@ def parse_extra_env(values: list[str]) -> dict[str, str]:
     return env_vars
 
 
+def install_requirements(args: argparse.Namespace, source_dir: Path) -> None:
+    """Install Python dependencies into the interpreter used for deployment steps."""
+    if args.skip_install_requirements:
+        return
+
+    requirements_file = source_dir / "requirements.txt"
+    if not requirements_file.exists():
+        print("requirements.txt not found. Skipping dependency installation.")
+        return
+
+    print(f"Installing dependencies from {requirements_file}...")
+    try:
+        run_cmd(
+            [args.python, "-m", "pip", "install", "-r", str(requirements_file)],
+            dry_run=args.dry_run,
+        )
+    except subprocess.CalledProcessError as exc:
+        raise RuntimeError(
+            "Dependency installation failed for the selected interpreter. "
+            "Use --python with a writable virtualenv interpreter, then retry."
+        ) from exc
+
+
 def deploy(args: argparse.Namespace) -> None:
     if not command_exists("gcloud"):
         raise RuntimeError("gcloud CLI is not installed or not available in PATH.")
@@ -144,14 +175,19 @@ def deploy(args: argparse.Namespace) -> None:
     static_dir = (source_dir / args.static_dir).resolve()
     static_dir.mkdir(parents=True, exist_ok=True)
 
-    bucket_name = args.bucket or f"{project_id}-django-static"
+    bucket_name = args.bucket_name or args.bucket or f"{project_id}-django-static"
     bucket_uri = f"gs://{bucket_name}"
-    static_url = f"https://storage.googleapis.com/{bucket_name}/static/"
+    static_release_dir = args.static_release_dir or datetime.now(timezone.utc).strftime(
+        "%Y%m%d-%H%M%S"
+    )
+    static_prefix = f"{static_release_dir}/static"
+    static_url = f"https://storage.googleapis.com/{bucket_name}/{static_prefix}/"
 
     print(f"Project: {project_id}")
     print(f"Region: {args.region}")
     print(f"Service: {args.service}")
     print(f"Bucket: {bucket_uri}")
+    print(f"Static release dir: {static_release_dir}")
 
     run_cmd(["gcloud", "config", "set", "project", project_id], dry_run=args.dry_run)
 
@@ -178,17 +214,25 @@ def deploy(args: argparse.Namespace) -> None:
     )
     ensure_public_object_access(bucket_name=bucket_name, dry_run=args.dry_run)
 
+    install_requirements(args=args, source_dir=source_dir)
+
     local_env = os.environ.copy()
     local_env.setdefault("DJANGO_DEBUG", "False")
     local_env.setdefault("ALLOWED_HOSTS", "127.0.0.1,localhost")
     local_env["STATIC_URL"] = static_url
 
     print("Collecting static files...")
-    run_cmd(
-        [args.python, str(manage_py), "collectstatic", "--noinput", "--clear"],
-        env=local_env,
-        dry_run=args.dry_run,
-    )
+    try:
+        run_cmd(
+            [args.python, str(manage_py), "collectstatic", "--noinput", "--clear"],
+            env=local_env,
+            dry_run=args.dry_run,
+        )
+    except subprocess.CalledProcessError as exc:
+        raise RuntimeError(
+            "collectstatic failed. Ensure dependencies are installed in the interpreter passed via "
+            "--python and retry. Example: --python /path/to/venv/bin/python"
+        ) from exc
 
     print("Syncing static files to GCS...")
     run_cmd(
@@ -199,7 +243,7 @@ def deploy(args: argparse.Namespace) -> None:
             "--recursive",
             "--delete-unmatched-destination-objects",
             str(static_dir),
-            f"{bucket_uri}/static",
+            f"{bucket_uri}/{static_prefix}",
             "--project",
             project_id,
         ],
@@ -267,8 +311,16 @@ def build_parser() -> argparse.ArgumentParser:
         default="src/staticfiles",
         help="Directory populated by collectstatic and synced to GCS.",
     )
-    parser.add_argument("--bucket", help="GCS bucket name for static files.")
+    parser.add_argument("--bucket-name", help="GCS bucket name for static files.")
+    parser.add_argument(
+        "--bucket",
+        help="Backward-compatible alias for --bucket-name.",
+    )
     parser.add_argument("--bucket-location", default="US", help="Bucket location (for new buckets).")
+    parser.add_argument(
+        "--static-release-dir",
+        help="Static release subdirectory in yyyymmdd-hhmmss format. Defaults to current UTC timestamp.",
+    )
     parser.add_argument("--python", default=sys.executable or "python3", help="Python executable to run manage.py")
     parser.add_argument("--port", type=int, default=8080, help="Container port for Cloud Run.")
     parser.add_argument("--secret-key", help="Django secret key for Cloud Run runtime.")
@@ -290,6 +342,11 @@ def build_parser() -> argparse.ArgumentParser:
         action="store_true",
         help="Print commands without executing them.",
     )
+    parser.add_argument(
+        "--skip-install-requirements",
+        action="store_true",
+        help="Skip running '<python> -m pip install -r requirements.txt' before collectstatic.",
+    )
     return parser
 
 
@@ -308,4 +365,8 @@ if __name__ == "__main__":
     raise SystemExit(main())
 
 
-    # python3 deployment.py --project-id YOUR_PROJECT_ID --region us-central1 --service image-video-qa --allow-unauthenticated
+    # python3 deployment.py \
+    #   --project-id YOUR_PROJECT_ID \
+    #   --region us-central1 \
+    #   --service image-video-qa \
+    #   --allow-unauthenticated

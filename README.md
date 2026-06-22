@@ -41,43 +41,32 @@ image-video-qa/
 		└── db.sqlite3   # local DB
 ```
 
-## Local setup
+## Docker Compose setup (no local Python package install)
 
-1. Create and activate a virtual environment:
+All dependencies are installed inside Docker image layers. You do not need to install any Python packages on your host machine.
 
-```bash
-python3 -m venv .venv
-source .venv/bin/activate
-```
-
-2. Install dependencies:
+1. Build and start the app:
 
 ```bash
-pip install -r requirements.txt
+docker compose up --build -d
 ```
 
-3. Run database migrations:
+2. Create an admin user:
 
 ```bash
-python src/manage.py migrate
+docker compose exec web python manage.py createsuperuser
 ```
 
-4. Create an admin user:
-
-```bash
-python src/manage.py createsuperuser
-```
-
-5. Start the development server:
-
-```bash
-python src/manage.py runserver
-```
-
-6. Open the app:
+3. Open the app:
 
 - Landing page: `http://127.0.0.1:8000/`
 - Admin: `http://127.0.0.1:8000/admin/`
+
+4. Stop containers:
+
+```bash
+docker compose down
+```
 
 ## First-run admin bootstrap
 
@@ -144,27 +133,28 @@ Current list:
 ## Configuration notes
 
 - Default DB is SQLite at [src/db.sqlite3](src/db.sqlite3).
+- In Docker Compose, SQLite is moved to `/data/db.sqlite3` via the `SQLITE_PATH` environment variable and persisted in a Docker volume.
 - Media uploads are stored under [src/media](src/media).
 - Static assets live under [src/static](src/static).
-- The settings currently include an EXIF tool path pointing to a Windows executable:
-	- `EXIF_PATH = BASE_DIR / 'exiftool' / 'exiftool.exe'`
+- EXIF executable path can now be configured by environment variable `EXIF_PATH`.
 
-If you run on macOS/Linux and need EXIF tooling, update this path accordingly.
-
-## Common development commands
+## Common container commands
 
 ```bash
-# Run server
-python src/manage.py runserver
-
 # Make migrations
-python src/manage.py makemigrations
+docker compose exec web python manage.py makemigrations
 
 # Apply migrations
-python src/manage.py migrate
+docker compose exec web python manage.py migrate
 
 # Django shell
-python src/manage.py shell
+docker compose exec web python manage.py shell
+
+# Follow logs
+docker compose logs -f web
+
+# Rebuild image after requirements changes
+docker compose up --build -d
 ```
 
 ## Troubleshooting

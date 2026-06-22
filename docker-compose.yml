@@ -1,0 +1,25 @@
+services:
+  web:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: image_video_qa_web
+    ports:
+      - "8000:8000"
+    environment:
+      DJANGO_DEBUG: "False"
+      DJANGO_SECRET_KEY: "${DJANGO_SECRET_KEY:-change-this-in-env}"
+      ALLOWED_HOSTS: "localhost,127.0.0.1"
+      CSRF_TRUSTED_ORIGINS: "http://localhost:8000,http://127.0.0.1:8000"
+      SQLITE_PATH: "/data/db.sqlite3"
+      EXIF_PATH: "/usr/bin/exiftool"
+    volumes:
+      - media_data:/app/src/media
+      - static_data:/app/src/staticfiles
+      - db_data:/data
+    restart: unless-stopped
+
+volumes:
+  media_data:
+  static_data:
+  db_data:
